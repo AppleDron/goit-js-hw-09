@@ -11,6 +11,14 @@ function onSubmit(event) {
   const amount = Number(form.amount.value);
   const step = Number(form.step.value);
 
+  if (step < 0 || delay < 0 || amount <= 0) {
+    Notiflix.Report.failure(
+      'Failure',
+      'Please take correct values',
+      'Try again'
+    );
+    return;
+  }
   for (let i = 1; i <= amount; i += 1) {
     createPromise(i, delay)
       .then(({ position, delay }) => {

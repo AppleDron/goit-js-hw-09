@@ -4,11 +4,15 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const input = document.querySelector('#datetime-picker');
 const start = document.querySelector('[data-start]');
+const reset = document.querySelector('[data-reset]');
 const days = document.querySelector('[data-days]');
 const hours = document.querySelector('[data-hours]');
 const minutes = document.querySelector('[data-minutes]');
 const seconds = document.querySelector('[data-seconds]');
+let userTime;
+let IntervalId;
 const disableBtn = value => (start.disabled = value);
+const disableInput = value => (input.disabled = value);
 
 disableBtn(true);
 
@@ -27,15 +31,19 @@ const fl = flatpickr(input, {
     }
     disableBtn(false);
     start.addEventListener('click', setTimer);
+    reset.addEventListener('click', resetTimer);
+
+    userTime = selectedDates[0];
   },
 });
 
 function setTimer() {
-  const IntervalId = setInterval(() => {
+  IntervalId = setInterval(() => {
     const currentTime = new Date();
-    const deltaDate = fl.selectedDates[0].getTime() - currentTime;
+    const deltaDate = userTime - currentTime;
     const timerTime = convertMs(deltaDate);
     const { timerDays, timerHours, timerMinutes, timerSeconds } = timerTime;
+    disableInput(true);
 
     days.textContent = timerDays;
     hours.textContent = timerHours;
@@ -43,10 +51,21 @@ function setTimer() {
     seconds.textContent = timerSeconds;
 
     if (deltaDate < 1000) {
+      disableInput(false);
       clearInterval(IntervalId);
       Notiflix.Notify.success('Success');
     }
   }, 1000);
+}
+
+function resetTimer() {
+  disableInput(false);
+  clearInterval(IntervalId);
+
+  days.textContent = '00';
+  hours.textContent = '00';
+  minutes.textContent = '00';
+  seconds.textContent = '00';
 }
 
 function addLeadingZero(value) {
